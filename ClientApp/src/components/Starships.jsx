@@ -55,7 +55,7 @@ export function Starships() {
     const fetchCrewFiltered = async () => {
       try {
         const response = await fetch(
-          `${API_BASE_URL}/api/starships/crew?crewCount=${encodeURIComponent(crewFilter)}`
+          `${API_BASE_URL}/api/starships/crew?crewSize=${encodeURIComponent(crewFilter)}`
         );
         if (!response.ok)
           throw new Error("Failed to fetch crew-filtered starships");
