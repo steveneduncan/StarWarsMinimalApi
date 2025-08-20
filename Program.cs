@@ -97,6 +97,30 @@ app.MapGet("/api/starships", async (AppDbContext db, ILogger<Program> logger) =>
     }
 });
 
+// Get all starships with crew >= crewSize (remove non-digits from Crew)
+app.MapGet("/api/starships/crew", async (AppDbContext db, ILogger<Program> logger, int crewSize) =>
+{
+    try
+    {
+        var starships = await db.Starships.ToListAsync();
+        var filtered = starships
+            .Where(s =>
+            {
+                var digits = new string(s.Crew.Where(char.IsDigit).ToArray());
+                return int.TryParse(digits, out var crewCount) && crewCount >= crewSize;
+            })
+            .ToList();
+
+        return Results.Ok(filtered);
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "Error occurred while retrieving starships.");
+        return Results.Problem("An error occurred while retrieving starships.");
+    }
+});
+
+
 // Get starships by Id
 app.MapGet("api/starships/{id:int}", async (int id, AppDbContext db) =>
 {
@@ -244,3 +268,7 @@ using (var scope = app.Services.CreateScope())
 app.Run();
 
 public record SqlConnectionInfo(string DataSource, string Database, string ServerVersion);
+
+
+
+

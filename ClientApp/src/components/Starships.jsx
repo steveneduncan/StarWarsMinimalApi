@@ -7,6 +7,7 @@ export function Starships() {
   const [status, setStatus] = useState("loading"); // 'loading', 'error', 'success'
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
   const [filter, setFilter] = useState("");
+  const [crewFilter, setCrewFilter] = useState("");
   const [editIdx, setEditIdx] = useState(null);
   const [editRow, setEditRow] = useState(null);
   const [showEditForm, setShowEditForm] = useState(false);
@@ -45,12 +46,38 @@ export function Starships() {
     return sortable;
   }, [starships, sortConfig]);
 
-  const filteredStarships = sortedStarships.filter(
-    (ship) =>
-      ship.name.toLowerCase().includes(filter.toLowerCase()) ||
-      ship.model.toLowerCase().includes(filter.toLowerCase()) ||
-      ship.manufacturer.toLowerCase().includes(filter.toLowerCase())
-  );
+  const [crewFilteredStarships, setCrewFilteredStarships] = useState(null);
+  useEffect(() => {
+    if (crewFilter.trim() === "") {
+      setCrewFilteredStarships(null);
+      return;
+    }
+    const fetchCrewFiltered = async () => {
+      try {
+        const response = await fetch(
+          `${API_BASE_URL}/api/starships/crew?crewCount=${encodeURIComponent(crewFilter)}`
+        );
+        if (!response.ok)
+          throw new Error("Failed to fetch crew-filtered starships");
+        const data = await response.json();
+        setCrewFilteredStarships(data);
+      } catch (err) {
+        setCrewFilteredStarships([]);
+      }
+    };
+    fetchCrewFiltered();
+  }, [crewFilter, API_BASE_URL]);
+
+  const filteredStarships = React.useMemo(() => {
+    const baseList =
+      crewFilteredStarships !== null ? crewFilteredStarships : sortedStarships;
+    return baseList.filter(
+      (ship) =>
+        ship.name.toLowerCase().includes(filter.toLowerCase()) ||
+        ship.model.toLowerCase().includes(filter.toLowerCase()) ||
+        ship.manufacturer.toLowerCase().includes(filter.toLowerCase())
+    );
+  }, [crewFilteredStarships, sortedStarships, filter]);
 
   useEffect(() => {
     async function fetchAndSeedIfEmpty() {
@@ -88,22 +115,33 @@ export function Starships() {
   return (
     <div className="max-w-4xl mt-8">
       <h1 className="text-3xl font-bold mb-4">Starships</h1>
-      <input
-        id="starship-filter"
-        name="starship-filter"
-        type="text"
-        placeholder="Filter by name, model, or manufacturer"
-        value={filter}
-        onChange={(e) => setFilter(e.target.value)}
-        className="mb-4 p-2 border border-gray-300 rounded w-full max-w-md"
-      />
 
-      <button
-        className="px-4 py-2 text-med bg-blue-500 text-white rounded ml-8"
-        onClick={() => setShowCreateForm(true)}
-      >
-        Create Starship
-      </button>
+      <div className="flex flex-row gap-4 mb-4 items-center">
+        <input
+          id="starship-filter"
+          name="starship-filter"
+          type="text"
+          placeholder="Filter by name, model, or manufacturer"
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+          className="p-2 border border-gray-300 rounded w-full max-w-md"
+        />
+        <input
+          id="crew-filter"
+          name="crew-filter"
+          type="text"
+          placeholder="Filter by crew size"
+          value={crewFilter}
+          onChange={(e) => setCrewFilter(e.target.value)}
+          className="p-2 border border-gray-300 rounded w-36 min-w-[110px]"
+        />
+        <button
+          className="px-4 py-2 text-med bg-blue-500 text-white rounded"
+          onClick={() => setShowCreateForm(true)}
+        >
+          Create Starship
+        </button>
+      </div>
 
       {showCreateForm && (
         <CreateStarshipModal
@@ -157,8 +195,8 @@ export function Starships() {
                       (isEditing
                         ? " ring-2 ring-blue-400 ring-inset z-10"
                         : isDeleting
-                        ? " ring-2 ring-red-500 ring-inset z-10"
-                        : "")
+                          ? " ring-2 ring-red-500 ring-inset z-10"
+                          : "")
                     }
                     onClick={() => {
                       if (editIdx !== null && editIdx !== idx) {

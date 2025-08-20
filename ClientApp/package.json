@@ -3,6 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@vitest/coverage-v8": "^3.2.4",
+    "ESLint": "npm:eslint@^8.57.1",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
     "http-proxy-middleware": "^2.0.6",
     "jquery": "^3.6.4",
     "merge": "^2.1.1",
@@ -28,16 +33,28 @@
     "workbox-streams": "^6.5.4"
   },
   "devDependencies": {
+    "@eslint/js": "^9.33.0",
+    "@testing-library/jest-dom": "^6.7.0",
+    "@testing-library/react": "^16.3.0",
+    "@typescript-eslint/eslint-plugin": "^5.62.0",
+    "@typescript-eslint/parser": "^5.62.0",
+    "@vitejs/plugin-react": "^5.0.1",
+    "@vitest/ui": "^3.2.4",
     "ajv": "^8.12.0",
     "cross-env": "^7.0.3",
-    "eslint": "^8.39.0",
+    "eslint": "^8.57.1",
     "eslint-config-react-app": "^7.0.1",
     "eslint-plugin-flowtype": "^8.0.3",
-    "eslint-plugin-import": "^2.27.5",
-    "eslint-plugin-jsx-a11y": "^6.7.1",
-    "eslint-plugin-react": "^7.32.2",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "globals": "^16.3.0",
+    "jsdom": "^26.1.0",
     "nan": "^2.17.0",
-    "typescript": "^4.9.5"
+    "prettier": "3.6.2",
+    "typescript": "^4.9.5",
+    "vitest": "^3.2.4"
   },
   "overrides": {
     "nth-check": "2.1.1",
@@ -47,7 +64,9 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "lint": "eslint ./src/"
+    "lint": "eslint ./src/",
+    "test": "vitest",
+    "test:ui": "vitest --ui"
   },
   "eslintConfig": {
     "extends": [
